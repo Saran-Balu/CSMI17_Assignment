@@ -1,0 +1,16 @@
+% Define the speaker as 'me' and their father
+father(john, me).  % John is the father of me (the speaker)
+
+% Define that the speaker has no siblings
+has_no_siblings(me).
+
+% Define the father-son relationship
+father(me, son).  % The speaker (me) is the father of the son
+
+% Rule to determine "that man"
+that_man(Person) :- 
+    has_no_siblings(me),  % Ensure the speaker has no siblings
+    father(me, Person).     % Child is the speaker's son
+
+% Query to find that man
+?- that_man(Person).
