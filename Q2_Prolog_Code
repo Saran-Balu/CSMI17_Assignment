@@ -1,0 +1,68 @@
+% Define the weights of individuals
+weight(man, 80).
+weight(woman, 80).
+weight(child1, 30).
+weight(child2, 30).
+
+% Define the opposite bank
+opposite(left, right).
+opposite(right, left).
+
+% Initial state: everyone starts on the left bank with the boat on the left
+initial_state(state([man, woman, child1, child2], [], left)).
+
+% Goal state: everyone has crossed to the right bank
+goal_state(state([], [man, woman, child1, child2], right)).
+
+% Move: two people cross from left to right
+move(state(L, R, left), state(NewL, [P1, P2 | R], right), Action) :-
+    select(P1, L, TempL),
+    select(P2, TempL, NewL),
+    weight(P1, W1), weight(P2, W2),
+    TotalWeight is W1 + W2,
+    TotalWeight =< 100,
+    Action = [P1, P2, cross_left_to_right].
+
+% Move: two people cross from right to left
+move(state(L, R, right), state([P1, P2 | L], NewR, left), Action) :-
+    select(P1, R, TempR),
+    select(P2, TempR, NewR),
+    weight(P1, W1), weight(P2, W2),
+    TotalWeight is W1 + W2,
+    TotalWeight =< 100,
+    Action = [P1, P2, cross_right_to_left].
+
+% Move: one person crosses from left to right
+move(state(L, R, left), state(NewL, [P | R], right), Action) :-
+    select(P, L, NewL),
+    weight(P, W),
+    W =< 100,
+    Action = [P, cross_left_to_right].
+
+% Move: one person crosses from right to left
+move(state(L, R, right), state([P | L], NewR, left), Action) :-
+    select(P, R, NewR),
+    weight(P, W),
+    W =< 100,
+    Action = [P, cross_right_to_left].
+
+% Solve: base case when goal is reached
+solve(State, _) :- 
+    goal_state(State).
+
+% Solve: recursive case
+solve(State, Visited) :-
+    move(State, NewState, Action),
+    \+ member(NewState, Visited),
+    % Print the action as it is a valid move
+    format("~w crosses.~n", [Action]),
+    solve(NewState, [NewState | Visited]).
+
+% Query for the solution
+query :-
+    initial_state(InitialState),
+    solve(InitialState, [InitialState]).
+
+
+
+%output:  ['Children cross', 'Child1 returns', 'Man crosses', 'Child2 returns', 'Children cross', 'Child1 returns', 'Woman crosses', 'Child2 returns', 'Children cross']
