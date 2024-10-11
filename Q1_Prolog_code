@@ -14,3 +14,5 @@ that_man(Person) :-
 
 % Query to find that man
 ?- that_man(Person).
+
+% Person = Son
